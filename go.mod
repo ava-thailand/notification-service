@@ -8,6 +8,7 @@ require (
 	firebase.google.com/go v3.13.0+incompatible
 	firebase.google.com/go/v4 v4.8.0
 	github.com/anynines/go-ntlm-auth v0.0.0-20170912103015-eff1ed18c75d
+	github.com/fatih/structs v1.1.0 // indirect
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-ole/go-ole v1.2.6
 	github.com/go-playground/validator/v10 v10.11.0 // indirect

@@ -2,26 +2,20 @@ package usecase
 
 import (
 	"context"
+	"encoding/json"
 
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/messaging"
 
 	"google.golang.org/api/option"
+
+	"scbam/fcm-publisher/model"
 )
 
 func PushNotification(
 	decodedKey []byte,
-	title string,
-	body string,
-	payload map[string]string,
+	item model.NotificationItem,
 ) (err error) {
-
-	var deviceTokens []string
-
-	deviceTokens = append(
-		deviceTokens,
-		"cQ5QVImXSMutipD2SpOdKM:APA91bE0hsE2PsDY0-iesww5kEmXzQtZT1GDTLU_hXVPTXui31YNBdXkU-eiw0dn80fLtQemzsgyhl6P-Z9rn8rlM4nxsWyVI1Ue6ThNOeYh3kIee4cMLEpjli_cejQfKOq3f7QxNl2u",
-	)
 
 	opts := []option.ClientOption{
 		option.WithCredentialsJSON(decodedKey),
@@ -40,13 +34,23 @@ func PushNotification(
 		panic(err)
 	}
 
+	var payloadMap map[string]string
+	data, err := json.Marshal(item.Payload)
+	if err != nil {
+		panic(err)
+	}
+
+	if json.Unmarshal(data, &payloadMap) != nil {
+		panic(err)
+	}
+
 	response, err := fcmClient.SendMulticast(context.Background(), &messaging.MulticastMessage{
 		Notification: &messaging.Notification{
-			Title: title,
-			Body:  body,
+			Title: item.Title,
+			Body:  item.Body,
 		},
-		Data:   payload,
-		Tokens: deviceTokens, // it's an array of device tokens
+		Data:   payloadMap,
+		Tokens: item.DeviceTokens, // it's an array of device tokens
 	})
 
 	if err != nil {

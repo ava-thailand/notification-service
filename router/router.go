@@ -4,13 +4,15 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
+
+	"scbam/fcm-publisher/handler"
 )
 
 func NewRouter(e *gin.Engine) {
 
 	e.Use(CORSMiddleware())
 
-	// router.POST("/callback", handler.HandleLineMessage)
+	e.POST("/push_notification", handler.PushNotification)
 
 	fmt.Printf("Run")
 }
