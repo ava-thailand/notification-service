@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"net/http"
 	"scbam/fcm-publisher/helper"
 	"scbam/fcm-publisher/model"
 	"scbam/fcm-publisher/usecase"
@@ -25,7 +26,7 @@ func PushNotification(c *gin.Context) {
 		panic(err)
 	}
 
-	err = usecase.PushNotification(
+	response, err := usecase.PushNotification(
 		decodedKey,
 		*body,
 	)
@@ -34,4 +35,6 @@ func PushNotification(c *gin.Context) {
 		fmt.Printf("Err")
 		panic(err)
 	}
+
+	c.JSON(http.StatusOK, response)
 }

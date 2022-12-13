@@ -2,7 +2,9 @@ package usecase
 
 import (
 	"context"
-	"encoding/json"
+	"fmt"
+	"strconv"
+	"strings"
 
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/messaging"
@@ -15,7 +17,7 @@ import (
 func PushNotification(
 	decodedKey []byte,
 	item model.NotificationItem,
-) (err error) {
+) (notificationResponse model.NotificationResponse, err error) {
 
 	opts := []option.ClientOption{
 		option.WithCredentialsJSON(decodedKey),
@@ -25,23 +27,28 @@ func PushNotification(
 	app, err := firebase.NewApp(context.Background(), nil, opts...)
 
 	if err != nil {
+		fmt.Printf("err" + err.Error())
 		panic(err)
 	}
 
 	fcmClient, err := app.Messaging(context.Background())
 
 	if err != nil {
+		fmt.Printf("err" + err.Error())
 		panic(err)
 	}
-
-	var payloadMap map[string]string
-	data, err := json.Marshal(item.Payload)
-	if err != nil {
-		panic(err)
+	payloadMap := map[string]string{
+		"\"id\"":       strconv.Itoa(item.Payload.Id),
+		"\"type\"":     "\"" + item.Payload.Type + "\"",
+		"\"date\"":     strconv.Itoa(item.Payload.Date),
+		"\"title\"":    "\"" + item.Payload.Title + "\"",
+		"\"content\"":  "\"" + item.Payload.Content + "\"",
+		"\"url\"":      "\"" + item.Payload.Url + "\"",
+		"\"fundCode\"": "[\"" + strings.Join(item.Payload.FundCode, "\",\"") + "\"]",
 	}
 
-	if json.Unmarshal(data, &payloadMap) != nil {
-		panic(err)
+	if len(item.Payload.Image) > 0 {
+		payloadMap["image"] = item.Payload.Image
 	}
 
 	response, err := fcmClient.SendMulticast(context.Background(), &messaging.MulticastMessage{
@@ -54,9 +61,12 @@ func PushNotification(
 	})
 
 	if err != nil {
+		fmt.Printf("err" + err.Error())
 		panic(err)
 	}
 
+	notificationResponse.SuccessCount = response.SuccessCount
+	notificationResponse.FailureCount = response.FailureCount
 	print("\nResponse success count : ", response.SuccessCount)
 	print("\nResponse failure count : ", response.FailureCount)
 	print("\n")

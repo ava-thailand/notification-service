@@ -14,5 +14,9 @@ type NotificationItem struct {
 		IsRead   bool     `json:"isRead"`
 		FundCode []string `json:"fundCode" binding:"required"`
 	} `json:"payload" binding:"required"`
-	DeviceTokens []string `json:"deviceTokens" binding:"required"`
+	DeviceTokens []string `json:"tokens" binding:"required"`
+}
+type NotificationResponse struct {
+	SuccessCount int `json:"successCount" binding:"required"`
+	FailureCount int `json:"failureCount" binding:"required"`
 }

@@ -17,7 +17,7 @@ func main() {
 	helper.InitConfig()
 	port := helper.GetConfig("server.port")
 
-	gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(gin.DebugMode)
 
 	e := gin.Default()
 	router.NewRouter(e)
